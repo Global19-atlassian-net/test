@@ -13,6 +13,7 @@ import '../engine.dart';
 import '../load_exception.dart';
 import '../load_suite.dart';
 import '../reporter.dart';
+import 'reporter_utils.dart';
 
 /// A reporter that prints each test on its own line.
 ///
@@ -201,6 +202,7 @@ class ExpandedReporter implements Reporter {
     _progressLine(_description(liveTest), suffix: ' $_bold$_red[E]$_noColor');
 
     if (error is! LoadException) {
+      githubErrorHeader(_sink, error, stackTrace);
       _sink..writeln(indent('$error'))..writeln(indent('$stackTrace'));
       return;
     }

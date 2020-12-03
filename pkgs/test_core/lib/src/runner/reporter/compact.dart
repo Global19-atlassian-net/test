@@ -18,6 +18,7 @@ import '../engine.dart';
 import '../load_exception.dart';
 import '../load_suite.dart';
 import '../reporter.dart';
+import 'reporter_utils.dart';
 
 /// A reporter that prints test results to the console in a single
 /// continuously-updating line.
@@ -183,7 +184,7 @@ class CompactReporter implements Reporter {
       _stopwatch.start();
 
       // Keep updating the time even when nothing else is happening.
-      _subscriptions.add(Stream.periodic(Duration(seconds: 1))
+      _subscriptions.add(Stream.periodic(_logHeartbeat)
           .listen((_) => _progressLine(_lastProgressMessage ?? '')));
     }
 
@@ -238,6 +239,7 @@ class CompactReporter implements Reporter {
     _printedNewline = true;
 
     if (error is! LoadException) {
+      githubErrorHeader(_sink, error, stackTrace);
       _sink.writeln(indent(error.toString()));
       _sink.writeln(indent('$stackTrace'));
       return;
@@ -407,3 +409,6 @@ class CompactReporter implements Reporter {
     return name;
   }
 }
+
+final _logHeartbeat =
+    runningOnGitHubActions ? Duration(seconds: 10) : Duration(seconds: 1);
